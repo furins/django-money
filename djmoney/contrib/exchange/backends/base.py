@@ -2,7 +2,7 @@ import json
 import ssl
 from decimal import Decimal
 from urllib.parse import parse_qsl, urlparse, urlunparse
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from django.db.transaction import atomic
 from django.utils.http import urlencode
@@ -46,8 +46,12 @@ class BaseExchangeBackend:
 
     def get_response(self, **params):
         url = self.get_url(**params)
+        headers = {
+            "User-Agent": "Mozilla/5.0",
+        }
+        request = Request(self.get_url(**params), headers=headers)
         context = ssl.create_default_context(cafile=certifi.where())
-        response = urlopen(url, context=context)
+        response = urlopen(request, context=context)
         return response.read()
 
     def parse_json(self, response):

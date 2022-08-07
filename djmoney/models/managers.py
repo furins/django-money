@@ -176,7 +176,10 @@ def _get_model(args, func):
     """
     if hasattr(func, "__self__"):
         # Bound method
-        model = func.__self__.model
+        if hasattr(func.__self__, "model"):
+            model = func.__self__.model
+        else:
+            model = func.__self__._meta.base_manager.model
     elif hasattr(func, "__wrapped__"):
         # Proxy model
         model = func.__wrapped__.__self__.model
